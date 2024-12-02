@@ -15,6 +15,7 @@ steps:
 
 - task: NuGetCommand@2
   inputs:
+    command: 'restore'
     restoreSolution: '$(solution)'
 
 - task: DotNetCoreCLI@2
@@ -25,14 +26,13 @@ steps:
 
 - task: DotNetCoreCLI@2
   inputs:
-    command: 'test'
+    command: 'pack'
     projects: '$(solution)'
-    arguments: '--configuration $(buildConfiguration)'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'  # Specify output directory for .nupkg
+
 - task: NuGetCommand@2
   inputs:
     command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-    publishFeedCredentials: 'CSharpClassLibraryFeed'  # Correct service connection name
-    nuGetFeed: 'isikder0879'  # Feed name for Azure Artifacts
-
-
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'  # Push the generated .nupkg files
+    publishFeedCredentials: 'CSharpClassLibraryFeed'  # Your service connection
+    nuGetFeed: 'https://pkgs.dev.azure.com/isikder0879/_packaging/isikder0879/nuget/v3/index.json'  # Feed URL
