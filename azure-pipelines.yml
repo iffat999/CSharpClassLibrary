@@ -1,42 +1,41 @@
 trigger:
-  - main  # Trigger the pipeline on the main branch
+- main
 
 pool:
-  name: 'Default'  # Specify your self-hosted agent pool name
-  vmImage: 'windows-latest'  # You can also use a predefined image as fallback if needed
+  name: Default
+  vmImage: 'macos-latest'  # Use macOS agent if using self-hosted macOS agent, or 'windows-latest' for a Microsoft-hosted agent
 
 variables:
-  solution: '**/*.sln'  # Solution file to build
-  buildPlatform: 'Any CPU'  # Build platform
-  buildConfiguration: 'Release'  # Build configuration (Release or Debug)
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
 
 steps:
-  # Install NuGet tool
-  - task: NuGetToolInstaller@1
+- task: NuGetToolInstaller@1
 
-  # Restore NuGet packages for the solution
-  - task: NuGetCommand@2
-    inputs:
-      restoreSolution: '$(solution)'
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
 
-  # Build the solution
-  - task: VSBuild@1
-    inputs:
-      solution: '$(solution)'
-      msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-      platform: '$(buildPlatform)'
-      configuration: '$(buildConfiguration)'
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
 
-  # Run unit tests with VSTest
-  - task: VSTest@3  # Use the VSTest task to run unit tests
-    inputs:
-      testSelector: 'testAssemblies'
-      testAssemblyVer2: |
-        **\bin\**\*test.dll
-        **\bin\**\*tests.dll
-      searchFolder: '$(System.DefaultWorkingDirectory)'  # Directory where tests are located
-      vsTestVersion: '17.0'  # Specify Visual Studio Test version
-      testResultsFolder: '$(Agent.TempDirectory)\TestResults'  # Path to store test results
-      runInParallel: true  # Option to run tests in parallel if possible
-      rerunFailedTests: true  # Rerun any failed tests automatically
-      failTaskIfMinimumTestsNotRun: 10  # Fail task if fewer than 10 tests run
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '$(solution)'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(solution)'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '$(solution)'
+    arguments: '--configuration $(buildConfiguration)'
