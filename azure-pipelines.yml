@@ -1,50 +1,42 @@
-# ASP.NET Core (.NET Framework)
-- task: VSTest@3
-  inputs:
-    testSelector: 'testAssemblies'
-    testAssemblyVer2: |
-      **\bin\**\*test.dll
-      **\bin\**\*tests.dll
-    searchFolder: '$(System.DefaultWorkingDirectory)'
-    vsTestVersion: '17.0'
-# Build and test ASP.NET Core projects targeting the full .NET Framework.
-# Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
-
 trigger:
-- main
+  - main  # Trigger the pipeline on the main branch
 
 pool:
-  vmImage: 'windows-latest'
-   name: 'Iffats-MBP' 
-- task: VSTest@3
-  inputs:
-    testSelector: 'testAssemblies'
-    testAssemblyVer2: |
-      **\bin\**\*test.dll
-      **\bin\**\*tests.dll
-    searchFolder: '$(System.DefaultWorkingDirectory)'
+  name: 'Default'  # Specify your self-hosted agent pool name
+  vmImage: 'windows-latest'  # You can also use a predefined image as fallback if needed
 
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+  solution: '**/*.sln'  # Solution file to build
+  buildPlatform: 'Any CPU'  # Build platform
+  buildConfiguration: 'Release'  # Build configuration (Release or Debug)
 
 steps:
-- task: NuGetToolInstaller@1
+  # Install NuGet tool
+  - task: NuGetToolInstaller@1
 
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
+  # Restore NuGet packages for the solution
+  - task: NuGetCommand@2
+    inputs:
+      restoreSolution: '$(solution)'
 
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+  # Build the solution
+  - task: VSBuild@1
+    inputs:
+      solution: '$(solution)'
+      msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
 
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+  # Run unit tests with VSTest
+  - task: VSTest@3  # Use the VSTest task to run unit tests
+    inputs:
+      testSelector: 'testAssemblies'
+      testAssemblyVer2: |
+        **\bin\**\*test.dll
+        **\bin\**\*tests.dll
+      searchFolder: '$(System.DefaultWorkingDirectory)'  # Directory where tests are located
+      vsTestVersion: '17.0'  # Specify Visual Studio Test version
+      testResultsFolder: '$(Agent.TempDirectory)\TestResults'  # Path to store test results
+      runInParallel: true  # Option to run tests in parallel if possible
+      rerunFailedTests: true  # Rerun any failed tests automatically
+      failTaskIfMinimumTestsNotRun: 10  # Fail task if fewer than 10 tests run
