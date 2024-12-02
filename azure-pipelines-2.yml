@@ -1,4 +1,5 @@
 trigger:
+
 - main
 
 pool:
@@ -33,3 +34,9 @@ steps:
     ArtifactName: 'isikder1'
     publishLocation: 'Container'
     MaxArtifactSize: 1
+- task: NuGetCommand@2
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'c5753a01-dbdc-42c7-a23b-c897b8077026/345eaa6d-f38c-49c5-ac9d-290f90df5041'
