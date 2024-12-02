@@ -33,7 +33,7 @@ steps:
 - task: NuGetCommand@2
   inputs:
     command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'  # Push the generated .nupkg files
-    nuGetFeed: 'isikder0879'  # Name of the Azure Artifacts Feed
-    versioning: 'off'
-    publishV3Feed: true
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+    nuGetFeedType: 'internal'
+    publishFeed: 'isikder0879'
+    allowPackageConflicts: true
