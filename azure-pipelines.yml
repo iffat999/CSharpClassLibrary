@@ -29,11 +29,9 @@ steps:
     command: 'pack'
     projects: '$(solution)'
     arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'  # Specify output directory for .nupkg
-
 - task: NuGetCommand@2
   inputs:
     command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
     nuGetFeedType: 'internal'
-    publishFeed: 'isikder0879'
-    allowPackageConflicts: true
+    publishVstsFeed: 'a5b43af6-9750-47cf-9a1a-f7a4ca549ba2'
