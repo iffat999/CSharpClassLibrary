@@ -32,6 +32,7 @@ steps:
   inputs:
     command: 'push'
     packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-    publishFeedCredentials: 'CSharpClassLibraryFeed'  # The name of your NuGet service connection
-    publishFeed: 'isikder0879'
+    publishFeedCredentials: 'CSharpClassLibraryFeed'  # Correct service connection name
+    nuGetFeed: 'isikder0879'  # Feed name for Azure Artifacts
+
 
