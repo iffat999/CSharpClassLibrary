@@ -28,15 +28,10 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'pack'
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'isikder1'
-    publishLocation: 'Container'
-    MaxArtifactSize: 1
+
 - task: NuGetCommand@2
   inputs:
     command: 'push'
     packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
     nuGetFeedType: 'internal'
-    publishVstsFeed: 'c5753a01-dbdc-42c7-a23b-c897b8077026/345eaa6d-f38c-49c5-ac9d-290f90df5041'
+    publishVstsFeed: 'a5b43af6-9750-47cf-9a1a-f7a4ca549ba2'
