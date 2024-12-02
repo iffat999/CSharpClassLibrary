@@ -16,6 +16,14 @@ trigger:
 
 pool:
   vmImage: 'windows-latest'
+   name: 'Iffats-MBP' 
+- task: VSTest@3
+  inputs:
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: |
+      **\bin\**\*test.dll
+      **\bin\**\*tests.dll
+    searchFolder: '$(System.DefaultWorkingDirectory)'
 
 variables:
   solution: '**/*.sln'
